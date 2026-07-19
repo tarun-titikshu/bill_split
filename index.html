@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ledger — split the bill fairly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="desk">
+
+  <header class="masthead">
+    <p class="masthead__eyebrow">no more guessing who owes what</p>
+    <h1 class="masthead__title">Ledger</h1>
+    <p class="masthead__sub">Log what was bought, who bought it, add the extra charge — Ledger splits it by actual spend, not by headcount.</p>
+  </header>
+
+  <div id="global-errors" class="error-panel" role="alert" hidden>
+    <p class="error-panel__title">Fix the following before Ledger can total this up:</p>
+    <ul id="global-errors-list"></ul>
+  </div>
+
+  <div class="layout">
+
+    <!-- ============ LEFT: PRODUCTS + PEOPLE, STACKED ============ -->
+    <main class="layout__left">
+
+      <section class="column column--products" aria-labelledby="products-heading">
+        <div class="column__head">
+          <h2 id="products-heading"><span class="column__index">I.</span> Products</h2>
+          <p class="column__hint">Name it or leave it blank — unnamed items become p1, p2, p3&hellip;</p>
+        </div>
+
+        <div id="product-rows" class="rows"></div>
+
+        <button type="button" id="add-product-btn" class="btn btn--add">+ Add product</button>
+      </section>
+
+      <section class="column column--people" aria-labelledby="people-heading">
+        <div class="column__head">
+          <h2 id="people-heading"><span class="column__index">II.</span> People</h2>
+          <p class="column__hint">Every item bought must be assigned to someone.</p>
+        </div>
+
+        <div id="person-cards" class="rows"></div>
+
+        <button type="button" id="add-person-btn" class="btn btn--add">+ Add person</button>
+      </section>
+
+    </main>
+
+    <!-- ============ RIGHT: EXTRA CHARGE + RECEIPT, FROZEN ============ -->
+    <aside class="layout__right">
+
+      <section class="extra-charge" aria-labelledby="extra-heading">
+        <h2 id="extra-heading"><span class="column__index">III.</span> Extra charge</h2>
+        <p class="column__hint">Tax, delivery, service fee, surcharge — anything on top of the item total. Leave 0 if none.</p>
+        <label class="field">
+          <span class="field__label">Amount (₹)</span>
+          <input type="number" id="extra-charge-input" class="field__input field__input--lg" min="0" step="0.01" value="0" inputmode="decimal">
+        </label>
+        <button type="button" id="calculate-btn" class="btn btn--primary">Split the bill</button>
+      </section>
+
+      <section id="result-section" class="result-section" hidden aria-live="polite">
+        <div class="receipt" id="receipt">
+          <!-- populated by JS -->
+        </div>
+      </section>
+
+    </aside>
+
+  </div>
+
+</div>
+
+<template id="product-row-template">
+  <div class="row product-row" data-role="product-row">
+    <span class="row__num" data-role="row-num"></span>
+    <label class="field field--grow">
+      <span class="field__label">Name</span>
+      <input type="text" class="field__input" data-role="name" placeholder="p1" maxlength="40">
+    </label>
+    <label class="field field--price">
+      <span class="field__label">Price (₹)</span>
+      <input type="number" class="field__input" data-role="price" min="0.01" step="0.01" placeholder="0.00">
+    </label>
+    <label class="field field--qty">
+      <span class="field__label">Qty</span>
+      <input type="number" class="field__input" data-role="quantity" min="1" step="1" value="1">
+    </label>
+    <button type="button" class="icon-btn" data-role="remove" aria-label="Remove product" title="Remove product">&times;</button>
+  </div>
+</template>
+
+<template id="person-card-template">
+  <div class="person-card" data-role="person-card">
+    <div class="person-card__head">
+      <span class="row__num" data-role="row-num"></span>
+      <label class="field field--grow">
+        <span class="field__label">Name</span>
+        <input type="text" class="field__input" data-role="name" placeholder="Person 1" maxlength="40">
+      </label>
+      <button type="button" class="icon-btn" data-role="remove-person" aria-label="Remove person" title="Remove person">&times;</button>
+    </div>
+
+    <div class="purchases" data-role="purchases"></div>
+
+    <button type="button" class="btn btn--add btn--small" data-role="add-purchase">+ Add item bought</button>
+  </div>
+</template>
+
+<template id="purchase-row-template">
+  <div class="row purchase-row" data-role="purchase-row">
+    <label class="field field--grow">
+      <span class="field__label">Product</span>
+      <select class="field__input" data-role="product-select"></select>
+    </label>
+    <label class="field field--qty">
+      <span class="field__label">Qty</span>
+      <input type="number" class="field__input" data-role="quantity" min="1" step="1" value="1">
+    </label>
+    <button type="button" class="icon-btn" data-role="remove-purchase" aria-label="Remove item" title="Remove item">&times;</button>
+  </div>
+</template>
+
+<script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
